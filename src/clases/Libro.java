@@ -1,49 +1,57 @@
 package clases;
 
 public class Libro {
+	private String icbn;
+	private String titulo;
+	private String autor;
+	private String edicion;
+	private EstadoLibro estado;
 
-    public enum EstadoLibro { DISPONIBLE, PRESTADO, RESERVADO, NO_DISPONIBLE }
+	public Libro(String icbn, String titulo, String autor, String edicion, EstadoLibro estado) {
+		this.icbn = icbn;
+		this.titulo = titulo;
+		this.autor = autor;
+		this.edicion = edicion;
+		this.estado = estado;
+	}
 
-    private String icbn;
-    private String titulo;
-    private String autor;
-    private String edicion;
-    private EstadoLibro estado;
+	public String getIcbn() {
+		return icbn;
+	}
 
-    // Constructor
-    public Libro(String icbn, String titulo, String autor, String edicion, EstadoLibro estado) {
-        this.icbn = icbn;
-        this.titulo = titulo;
-        this.autor = autor;
-        this.edicion = edicion;
-        this.estado = estado;
-    }
+	public String getTitulo() {
+		return titulo;
+	}
 
-    // Getters y Setters
-    public String getIcbn() { return icbn; }
-    public void setIcbn(String icbn) { this.icbn = icbn; }
+	public String getAutor() {
+		return autor;
+	}
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+	public String getEdicion() {
+		return edicion;
+	}
 
-    public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
+	public EstadoLibro getEstado() {
+		return estado;
+	}
 
-    public String getEdicion() { return edicion; }
-    public void setEdicion(String edicion) { this.edicion = edicion; }
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
 
-    public EstadoLibro getEstado() { return estado; }
-    public void setEstado(EstadoLibro estado) { this.estado = estado; }
+	public void setAutor(String autor) {
+		this.autor = autor;
+	}
 
-    // Método de conveniencia
-    @Override
-    public String toString() {
-        return "Libro{" +
-                "ICBN='" + icbn + '\'' +
-                ", Título='" + titulo + '\'' +
-                ", Autor='" + autor + '\'' +
-                ", Edición='" + edicion + '\'' +
-                ", Estado=" + estado +
-                '}';
-    }
+	public void setEdicion(String edicion) {
+		this.edicion = edicion;
+	}
+
+	public void setEstado(EstadoLibro estado) {
+		this.estado = estado;
+	}
+
+	public boolean estaDisponible() {
+		return estado == EstadoLibro.DISPONIBLE;
+	}
 }

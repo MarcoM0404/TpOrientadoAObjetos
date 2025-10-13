@@ -1,61 +1,78 @@
 package clases;
 
 public class Usuario {
-	
-	public enum EstadoUsuario{ ACTIVO , INACTIVO}
-	public enum RolUsuario {USUARIO, BIBLIOTECARIO}
-	
 	private String nombre;
 	private String apellido;
-	private String mail;
+	private String correo;
 	private String password;
 	private EstadoUsuario estado;
-	private final RolUsuario rol;
-	public Usuario(String nombre, String apellido, String mail, String password, EstadoUsuario estado,
-			RolUsuario rol) {
-		super();
+	private TipoUsuario tipo;
+
+	private String icbnPrestado = null;
+
+	public Usuario(String nombre, String apellido, String correo, String password, EstadoUsuario estado,
+			TipoUsuario tipo) {
 		this.nombre = nombre;
 		this.apellido = apellido;
-		this.mail = mail;
+		this.correo = correo;
 		this.password = password;
 		this.estado = estado;
-		this.rol = rol;
+		this.tipo = tipo;
 	}
+
 	public String getNombre() {
 		return nombre;
 	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+
 	public String getApellido() {
 		return apellido;
 	}
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
+
+	public String getCorreo() {
+		return correo;
 	}
-	public String getMail() {
-		return mail;
-	}
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
+
 	public String getPassword() {
 		return password;
 	}
-	public void setContraseña(String password) {
-		this.password = password;
-	}
+
 	public EstadoUsuario getEstado() {
 		return estado;
 	}
-	public void setEstado(EstadoUsuario estado) {
-		this.estado = estado;
-	}
-	public RolUsuario getRol() {
-		return rol;
-	}
-	
-	
-	
 
+	public TipoUsuario getTipo() {
+		return tipo;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void activar() {
+		this.estado = EstadoUsuario.ACTIVO;
+	}
+
+	public void inactivar() {
+		this.estado = EstadoUsuario.INACTIVO;
+	}
+
+	public boolean esActivo() {
+		return this.estado == EstadoUsuario.ACTIVO;
+	}
+
+	public boolean tienePrestamoVigente() {
+		return icbnPrestado != null;
+	}
+
+	public String getIcbnPrestado() {
+		return icbnPrestado;
+	}
+
+	public void asignarPrestamo(String icbn) {
+		this.icbnPrestado = icbn;
+	}
+
+	public void limpiarPrestamo() {
+		this.icbnPrestado = null;
+	}
 }
