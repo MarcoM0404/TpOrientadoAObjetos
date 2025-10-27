@@ -8,8 +8,6 @@ public class Usuario {
 	private EstadoUsuario estado;
 	private TipoUsuario tipo;
 
-	private String icbnPrestado = null;
-
 	public Usuario(String nombre, String apellido, String correo, String password, EstadoUsuario estado,
 			TipoUsuario tipo) {
 		this.nombre = nombre;
@@ -19,7 +17,7 @@ public class Usuario {
 		this.estado = estado;
 		this.tipo = tipo;
 	}
-
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -58,21 +56,5 @@ public class Usuario {
 
 	public boolean esActivo() {
 		return this.estado == EstadoUsuario.ACTIVO;
-	}
-
-	public boolean tienePrestamoVigente() {
-		return icbnPrestado != null;
-	}
-
-	public String getIcbnPrestado() {
-		return icbnPrestado;
-	}
-
-	public void asignarPrestamo(String icbn) {
-		this.icbnPrestado = icbn;
-	}
-
-	public void limpiarPrestamo() {
-		this.icbnPrestado = null;
 	}
 }

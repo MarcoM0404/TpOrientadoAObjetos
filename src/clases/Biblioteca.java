@@ -3,8 +3,10 @@ package clases;
 import java.util.ArrayList;
 
 public class Biblioteca {
-	private ArrayList<Usuario> usuarios = new ArrayList<Usuario>();
-	private ArrayList<Libro> libros = new ArrayList<Libro>();
+	private ArrayList<Usuario> usuarios;
+	private ArrayList<Libro> libros;
+	private ArrayList<Prestamo> prestamos = new ArrayList<Prestamo>();
+
 	private int librosAgregadosDuranteEjecucion = 0;
 	private int MAX_LIBROS_ADICIONALES = 10;
 
@@ -12,7 +14,6 @@ public class Biblioteca {
 		precargarDatos();
 	}
 
-	// buscar usuarios y libros 
 	public Usuario buscarUsuarioPorCorreo(String correo) {
 		for (int i = 0; i < usuarios.size(); i++) {
 			Usuario u = usuarios.get(i);
@@ -31,7 +32,7 @@ public class Biblioteca {
 		return null;
 	}
 
-	// login
+	// ... (login) ...
 	public Usuario login(String correo, String password) {
 		Usuario u = buscarUsuarioPorCorreo(correo);
 		if (u == null)
@@ -42,8 +43,7 @@ public class Biblioteca {
 			return null;
 		return u;
 	}
-
-	// consultar libros disponibles
+	
 	public ArrayList<Libro> librosDisponibles() {
 		ArrayList<Libro> disponibles = new ArrayList<Libro>();
 		for (int i = 0; i < libros.size(); i++) {
@@ -54,45 +54,65 @@ public class Biblioteca {
 		return disponibles;
 	}
 
-	// metodos de usuario BÁSICO
-	public String solicitarPrestamo(Usuario usuario, String icbn) {
-	    if (usuario.getTipo() != TipoUsuario.USUARIO)
-	        return "Solo los usuarios básicos pueden pedir préstamos";
-
-	    if (usuario.tienePrestamoVigente())
-	        return "El usuario ya tiene un préstamo vigente";
-
-	    Libro libro = buscarLibroPorIcbn(icbn);
-	    if (libro == null)
-	        return "Libro no encontrado";
-	    if (libro.getEstado() != EstadoLibro.DISPONIBLE)
-	        return "El libro no está disponible para préstamo";
-
-	    libro.setEstado(EstadoLibro.PRESTADO);
-	    usuario.asignarPrestamo(icbn);
-	    return "Préstamo realizado con éxito";
+	public Prestamo buscarPrestamoPorCorreo(String correo) {
+		for (Prestamo p : prestamos) {
+			if (p.getCorreoUsuario().equalsIgnoreCase(correo)) {
+				return p;
+			}
+		}
+		return null;
 	}
 
+	public boolean usuarioTienePrestamoVigente(Usuario usuario) {
+		return buscarPrestamoPorCorreo(usuario.getCorreo()) != null;
+	}
+
+	public String getIcbnPrestadoPorUsuario(Usuario usuario) {
+		Prestamo p = buscarPrestamoPorCorreo(usuario.getCorreo());
+		return (p != null) ? p.getIcbnLibro() : null;
+	}
+	
+
+	public String solicitarPrestamo(Usuario usuario, String icbn) {
+		if (usuario.getTipo() != TipoUsuario.USUARIO)
+			return "Solo los usuarios básicos pueden pedir préstamos";
+
+		if (usuarioTienePrestamoVigente(usuario))
+			return "El usuario ya tiene un préstamo vigente";
+
+		Libro libro = buscarLibroPorIcbn(icbn);
+		if (libro == null)
+			return "Libro no encontrado";
+		if (libro.getEstado() != EstadoLibro.DISPONIBLE)
+			return "El libro no está disponible para préstamo";
+
+		libro.setEstado(EstadoLibro.PRESTADO);
+		prestamos.add(new Prestamo(usuario.getCorreo(), icbn));
+		return "Préstamo realizado con éxito";
+	}
 
 	public String devolverLibro(Usuario usuario) {
-	    if (usuario.getTipo() != TipoUsuario.USUARIO)
-	        return "Solo un usuario básico puede devolver";
+		if (usuario.getTipo() != TipoUsuario.USUARIO)
+			return "Solo un usuario básico puede devolver";
 
-	    if (!usuario.tienePrestamoVigente())
-	        return "No tiene préstamo vigente";
+		if (!usuarioTienePrestamoVigente(usuario))
+			return "No tiene préstamo vigente";
 
-	    String icbn = usuario.getIcbnPrestado();
-	    Libro libro = buscarLibroPorIcbn(icbn);
-	    if (libro == null)
-	        return "Libro no encontrado";
+		String icbn = getIcbnPrestadoPorUsuario(usuario);
+		Libro libro = buscarLibroPorIcbn(icbn);
+		
+		if (libro != null) {
+			libro.setEstado(EstadoLibro.DISPONIBLE);
+		}
 
-	    libro.setEstado(EstadoLibro.DISPONIBLE);
-	    usuario.limpiarPrestamo();
-	    return "Libro devuelto con éxito";
+		Prestamo p = buscarPrestamoPorCorreo(usuario.getCorreo());
+		if (p != null) {
+			prestamos.remove(p);
+		}
+		
+		return "Libro devuelto con éxito";
 	}
 
-
-	// métodos de Bibliotecario
 	public String cambiarEstadoLibro(Usuario usuario, String icbn, EstadoLibro nuevoEstado) {
 	    if (usuario.getTipo() != TipoUsuario.BIBLIOTECARIO)
 	        return "Operación solo para bibliotecarios";
@@ -107,7 +127,6 @@ public class Biblioteca {
 	    return "Estado actualizado";
 	}
 
-
 	public String altaLibro(Usuario usuario, String icbn, String titulo, String autor, String edicion) {
 	    if (usuario.getTipo() != TipoUsuario.BIBLIOTECARIO)
 	        return "Operación solo para bibliotecarios";
@@ -118,15 +137,6 @@ public class Biblioteca {
 	    libros.add(new Libro(icbn, titulo, autor, edicion, EstadoLibro.DISPONIBLE));
 	    librosAgregadosDuranteEjecucion++;
 	    return "Libro agregado correctamente";
-	}
-
-	public String altaUsuarioBasico(Usuario usuario, String nombre, String apellido, String correo, String password) {
-	    if (usuario.getTipo() != TipoUsuario.BIBLIOTECARIO)
-	        return "Operación solo para bibliotecarios";
-	    if (buscarUsuarioPorCorreo(correo) != null)
-	        return "Ya existe un usuario con ese correo";
-	    usuarios.add(new UsuarioBasico(nombre, apellido, correo, password, EstadoUsuario.ACTIVO));
-	    return "Usuario básico dado de alta";
 	}
 
 	public String activarUsuario(Usuario usuario, String correo) {
@@ -150,23 +160,9 @@ public class Biblioteca {
 	}
 
 
-	// precarga de 2 usuarios basicos y 1 bibliotecario. Además de 10 libros
 	private void precargarDatos() {
-		usuarios.add(new UsuarioBasico("Ana", "Pérez", "ana@demo.com", "1234", EstadoUsuario.ACTIVO));
-		usuarios.add(new UsuarioBasico("Luis", "Gómez", "luis@demo.com", "1234", EstadoUsuario.ACTIVO));
-		usuarios.add(new Bibliotecario("María", "López", "bibliotecaria@demo.com", "admin", EstadoUsuario.ACTIVO));
-
-		libros.add(new Libro("ICBN-001", "El Quijote", "Cervantes", "Ed. 1", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-002", "Cien años de soledad", "García Márquez", "Ed. 3", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-003", "Rayuela", "Cortázar", "Ed. 2", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-004", "Ficciones", "Borges", "Ed. 1", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-005", "La metamorfosis", "Kafka", "Ed. 4", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-006", "1984", "Orwell", "Ed. 2", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-007", "Crónica de una muerte anunciada", "García Márquez", "Ed. 1",
-				EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-008", "El Aleph", "Borges", "Ed. 5", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-009", "Pedro Páramo", "Rulfo", "Ed. 2", EstadoLibro.DISPONIBLE));
-		libros.add(new Libro("ICBN-010", "Fahrenheit 451", "Bradbury", "Ed. 6", EstadoLibro.DISPONIBLE));
+		this.usuarios = PrecargaDatos.getUsuariosIniciales();
+		this.libros = PrecargaDatos.getLibrosIniciales();
 	}
 
 	public ArrayList<Usuario> getUsuarios() {
