@@ -28,7 +28,6 @@ public class AppBiblioteca {
 
 	// Panel Bibliotecario
 	private JTextArea areaBib;
-	// <-- CAMBIO: Se elimina btnAltaUsuario, se restaura btnActivarUser -->
 	private JButton btnCambiarEstado, btnCargarLibro, btnActivarUser, btnInactivarUser,
 			btnCerrarSesionB, btnSalirB;
 
@@ -58,21 +57,22 @@ public class AppBiblioteca {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new CardLayout());
 
-		// 1. Crear Paneles
+		// crear paneles
 		panelLogin = crearPanelLogin();
 		panelAlumno = crearPanelAlumno();
 		panelBib = crearPanelBib();
 
-		// 2. Agregar Paneles al Frame
+		// agregar paneles al frame
 		frame.add(panelLogin, "LOGIN");
 		frame.add(panelAlumno, "ALUMNO");
 		frame.add(panelBib, "BIB");
 
-		// 3. Asignar Listeners
+		//listeners
 		asignarListeners();
 	}
 
-	// --- Métodos de Creación de Paneles (Refactorización) ---
+	// creacion de paneles
+	
 
 	private JPanel crearPanelLogin() {
 		JPanel panel = new JPanel(new GridBagLayout());
@@ -150,11 +150,9 @@ public class AppBiblioteca {
 		areaBib.setEditable(false);
 		panel.add(new JScrollPane(areaBib), BorderLayout.CENTER);
 
-		// <-- CAMBIO: Hay 5 botones. GridLayout(2, 3) funciona bien. -->
 		JPanel botonesBib = new JPanel(new GridLayout(2, 3, 6, 6));
 		btnCambiarEstado = new JButton("Cambiar estado libro");
 		btnCargarLibro = new JButton("Cargar nuevo libro");
-		// <-- CAMBIO: Se elimina btnAltaUsuario, se restaura btnActivarUser -->
 		btnActivarUser = new JButton("Activar usuario");
 		btnInactivarUser = new JButton("Inactivar usuario");
 		btnCerrarSesionB = new JButton("Cerrar sesión");
@@ -162,7 +160,6 @@ public class AppBiblioteca {
 
 		btnCambiarEstado.setFont(fBtn);
 		btnCargarLibro.setFont(fBtn);
-		// <-- CAMBIO: Se elimina btnAltaUsuario.setFont(fBtn); -->
 		btnActivarUser.setFont(fBtn);
 		btnInactivarUser.setFont(fBtn);
 		btnCerrarSesionB.setFont(fBtn);
@@ -170,7 +167,6 @@ public class AppBiblioteca {
 
 		botonesBib.add(btnCambiarEstado);
 		botonesBib.add(btnCargarLibro);
-		// <-- CAMBIO: Se elimina botonesBib.add(btnAltaUsuario); -->
 		botonesBib.add(btnActivarUser);
 		botonesBib.add(btnInactivarUser);
 		botonesBib.add(btnCerrarSesionB);
@@ -182,7 +178,7 @@ public class AppBiblioteca {
 
 	private void asignarListeners() {
 
-		// --- Login ---
+		// login
 		btnIniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!validarLogin())
@@ -205,7 +201,7 @@ public class AppBiblioteca {
 		});
 		btnSalirLogin.addActionListener(salirListener);
 
-		// --- Alumno ---
+		// usuario
 		btnPrestar.addActionListener(e -> {
 			if (!asegurarSesion())
 				return;
@@ -230,7 +226,7 @@ public class AppBiblioteca {
 		btnCerrarSesionA.addActionListener(e -> cerrarSesion());
 		btnSalirA.addActionListener(salirListener);
 
-		// --- Bibliotecario ---
+		// bibliotecario
 		btnCambiarEstado.addActionListener(e -> {
 			if (!asegurarSesion())
 				return;
@@ -275,9 +271,7 @@ public class AppBiblioteca {
 			refrescarBib("Acción: Cargar libro (" + icbn + ")\nResultado: " + r);
 		});
 
-		// <-- CAMBIO: Se elimina todo el listener de btnAltaUsuario -->
 
-		// <-- CAMBIO: Se restaura el listener de btnActivarUser -->
 		btnActivarUser.addActionListener(e -> {
 			if (!asegurarSesion())
 				return;
@@ -304,7 +298,6 @@ public class AppBiblioteca {
 		btnSalirB.addActionListener(salirListener);
 	}
 
-	// ===== Helpers comunes (Modificados para la nueva lógica) =====
 
 	private boolean validarLogin() {
 		String email = txtCorreo.getText().trim();
@@ -363,7 +356,7 @@ public class AppBiblioteca {
 		return s;
 	}
 
-	// --- Métodos de refresco (MODIFICADOS) ---
+
 
 	private void refrescarAlumno(String encabezado) {
 		String datos = (encabezado == null ? "" : encabezado + "\n\n");
@@ -389,7 +382,7 @@ public class AppBiblioteca {
 		if (usuarioLogueado != null && usuarioLogueado.getTipo() == TipoUsuario.USUARIO) {
 			boolean tienePrestamo = biblioteca.usuarioTienePrestamoVigente(usuarioLogueado);
 			puedeDevolver = tienePrestamo;
-			puedePrestar = !tienePrestamo; // máx 1 a la vez
+			puedePrestar = !tienePrestamo; // max 1 a la vez
 		}
 
 		btnPrestar.setEnabled(puedePrestar);
