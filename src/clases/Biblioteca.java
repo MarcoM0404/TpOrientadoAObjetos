@@ -32,17 +32,7 @@ public class Biblioteca {
 		return null;
 	}
 
-	// ... (login) ...
-	public Usuario login(String correo, String password) {
-		Usuario u = buscarUsuarioPorCorreo(correo);
-		if (u == null)
-			return null;
-		if (!u.esActivo())
-			return null;
-		if (!u.getPassword().equals(password))
-			return null;
-		return u;
-	}
+
 	
 	public ArrayList<Libro> librosDisponibles() {
 		ArrayList<Libro> disponibles = new ArrayList<Libro>();
@@ -69,10 +59,13 @@ public class Biblioteca {
 
 	public String getIcbnPrestadoPorUsuario(Usuario usuario) {
 		Prestamo p = buscarPrestamoPorCorreo(usuario.getCorreo());
-		return (p != null) ? p.getIcbnLibro() : null;
+		if (p != null) {
+			return p.getIcbnLibro();
+		} else {
+			return null;
+		}
 	}
 	
-
 	public String solicitarPrestamo(Usuario usuario, String icbn) {
 		if (usuario.getTipo() != TipoUsuario.USUARIO)
 			return "Solo los usuarios básicos pueden pedir préstamos";
