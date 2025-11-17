@@ -388,25 +388,49 @@ public class AppBiblioteca {
 		btnPrestar.setEnabled(puedePrestar);
 		btnDevolver.setEnabled(puedeDevolver);
 	}
-
+	
+	
+	// mostrar libros prestados y a quien 
 	private void refrescarBib(String encabezado) {
-		String datos = (encabezado == null ? "" : encabezado + "\n\n");
-		datos += "Bibliotecario: " + usuarioLogueado.getNombre() + " " + usuarioLogueado.getApellido() + "\n";
-		datos += "\nLibros (todos):\n";
-		ArrayList<Libro> libros = biblioteca.getLibros();
-		for (int i = 0; i < libros.size(); i++) {
-			Libro l = libros.get(i);
-			datos += l.getIcbn() + " - " + l.getTitulo() + " [" + l.getEstado() + "]\n";
-		}
-		datos += "\nUsuarios:\n";
-		ArrayList<Usuario> usuarios = biblioteca.getUsuarios();
-		for (int i = 0; i < usuarios.size(); i++) {
-			Usuario u = usuarios.get(i);
-			datos += u.getNombre() + " " + u.getApellido() + " - " + u.getCorreo() + " (" + u.getEstado() + ", "
-					+ u.getTipo() + ")\n";
-		}
-		areaBib.setText(datos);
+	    String datos;
+	    if (encabezado == null) {
+	        datos = "";
+	    } else {
+	        datos = encabezado + "\n\n";
+	    }
+	    datos += "Bibliotecario: " + usuarioLogueado.getNombre() + " " + usuarioLogueado.getApellido() + "\n";
+	    
+	    datos += "\nLibros (todos):\n";
+	    ArrayList<Libro> libros = biblioteca.getLibros();
+	    
+	    // un for para mostrar a quien los tiene prestados a los libros
+	    for (int i = 0; i < libros.size(); i++) {
+	        Libro l = libros.get(i);
+	        
+	        String infoExtra = " [" + l.getEstado() + "]"; // Texto por defecto
+	        
+	        // si el libr está prestado, se busca a quien
+	        if (l.getEstado() == EstadoLibro.PRESTADO) {
+	            Usuario u = biblioteca.getUsuarioQueTieneElLibro(l.getIcbn());
+	            if (u != null) {
+	                // si se encuentra, se arma el texto
+	                infoExtra = " [PRESTADO a " + u.getNombre() + " " + u.getApellido() + "]";
+	            }
+	        }
+	        
+	        datos += l.getIcbn() + " - " + l.getTitulo() + infoExtra + "\n";
+	    }
+	    
+	    datos += "\nUsuarios:\n";
+	    ArrayList<Usuario> usuarios = biblioteca.getUsuarios();
+	    for (int i = 0; i < usuarios.size(); i++) {
+	        Usuario u = usuarios.get(i);
+	        datos += u.getNombre() + " " + u.getApellido() + " - " + u.getCorreo() + " (" + u.getEstado() + ", "
+	                + u.getTipo() + ")\n";
+	    }
+	    areaBib.setText(datos);
 	}
+	
 	
 	// metodos para seleccionar 
 	

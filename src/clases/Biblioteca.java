@@ -165,4 +165,21 @@ public class Biblioteca {
 	public ArrayList<Libro> getLibros() {
 		return libros;
 	}
+	
+	
+	public Usuario getUsuarioQueTieneElLibro(String icbn) {
+		Prestamo prestamoEncontrado = null;
+		for (Prestamo p : prestamos) {
+			if (p.getIcbnLibro().equals(icbn)) {
+				prestamoEncontrado = p;
+				break; 
+			}
+		}
+
+		if (prestamoEncontrado != null) {
+			return buscarUsuarioPorCorreo(prestamoEncontrado.getCorreoUsuario());
+		}
+
+		return null;
+	}
 }
